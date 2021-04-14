@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace RocketShips.Lib
 {
-    class _7QwRemoteProvider
+    class _11References
     {
-        // use the data tables filter to produce a cosmos query V3 style
+        // https://www.entityframeworktutorial.net/
     }
 }
