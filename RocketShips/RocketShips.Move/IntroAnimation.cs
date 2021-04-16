@@ -49,6 +49,7 @@ namespace RocketShips.Move
             }
             Console.SetCursorPosition(Left, Top);
             Console.WriteLine(text);
+            Console.ReadLine();
         }
 
         string line1 = "   __";

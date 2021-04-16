@@ -15,20 +15,22 @@ namespace RocketShips.Move
             var optionsBuilder = new DbContextOptionsBuilder<AdventureWorksContext>();
             optionsBuilder.UseSqlServer(Settings.Adventure);
             AdventureWorksContext context = new AdventureWorksContext(optionsBuilder.Options);
-            //new IntroAnimation().Play();
-
+            new IntroAnimation().Play();
             
-            //History history = new History(context);
-            //history.HistoryPresenter();
+            History history = new History(context);
+            history.Presenter();
 
-            LanguageSupport language = new LanguageSupport();
+            LanguageSupport language = new LanguageSupport(context);
             language.Presenter();
 
-            //QueryOperators queryOperators = new QueryOperators();
-            //queryOperators.Presenter();
+            QueryOperators queryOperators = new QueryOperators();
+            queryOperators.Presenter();
 
-            //Performance perf = new Performance(context);
-            //perf.PerformancePresenter();
+            DeferredExecution deferred = new DeferredExecution(context);
+            deferred.Presenter();
+            
+            Performance perf = new Performance(context);
+            perf.PerformancePresenter();
 
             Console.ReadLine();
         }

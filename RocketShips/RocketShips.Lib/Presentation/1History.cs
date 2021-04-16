@@ -15,7 +15,9 @@ namespace RocketShips.Lib
         {
             this.context = context;
             connString = context.Database.GetDbConnection().ConnectionString;
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("History");
+            Console.ResetColor();
             Console.ReadLine();
         }
 
@@ -152,7 +154,7 @@ WHERE p.ProductCategoryID = " + categoryID;
             public string Category { get; internal set; }
         }
 
-        public void HistoryPresenter()
+        public void Presenter()
         {
             var thenObj = ThenObjects();
             Write("Then", thenObj.Count, thenObj.FoundProducts);
@@ -162,6 +164,7 @@ WHERE p.ProductCategoryID = " + categoryID;
             Write("Then SQL", thenSql.Count, thenSql.FoundProducts);
             var nowSql = NowSql();
             Write("Now SQL", thenSql.Count, thenSql.FoundProducts);
+            Console.ReadLine();
         }
 
         public void Write(string state, int count, string found)

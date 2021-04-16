@@ -31,7 +31,9 @@ namespace RocketShips.Lib
         {
             this.context = context;
             InitQuery();
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("Performance");
+            Console.ResetColor();
             Console.ReadLine();
         }
 
@@ -61,15 +63,67 @@ namespace RocketShips.Lib
             System.Diagnostics.Debug.WriteLine(query);
         }
 
+        public void SplitQuery()
+        {
+            var result = context.Customers
+                .Include(pm => pm.CustomerAddresses)
+                .AsSplitQuery();
+
+            foreach (var item in result)
+            {
+                Console.WriteLine(item.CompanyName);
+                foreach (var address in item.CustomerAddresses)
+                {
+                    Console.WriteLine(address.AddressType);
+                }
+            }
+            string query = result.ToQueryString();
+            System.Diagnostics.Debug.WriteLine(query);
+        }
+
+
+
+        public void ComplexQueryA()
+        {
+            var resultA = context.Customers
+                .Include(pm => pm.CustomerAddresses)
+                .Select(c => c.CustomerAddresses.Select(a => new
+                {
+                    c.CompanyName,
+                    a.AddressType,
+                    a.Address.AddressLine1
+                }))
+                .ToList();
+        }
+
+        public void ComplexQueryB()
+        {
+            var resultB = (from customer in context.Customers
+                           join customerAddresses in context.CustomerAddresses on customer.CustomerId equals customerAddresses.CustomerId
+                           join addresses in context.Addresses on customerAddresses.AddressId equals addresses.AddressId
+                           select new
+                           {
+                               customer.CompanyName,
+                               customerAddresses.AddressType,
+                               addresses.AddressLine1
+                           }).ToList();
+        }
+
+
+
         public void PerformancePresenter()
         {
             Timer timer = new Timer();
 
             long smallDataSetDuration = timer.DurationFor(SimulateSmallDataSet);
             long largeDataSetDuration = timer.DurationFor(SimulateLargeDataSet);
+            long complexQueryADuration = timer.DurationFor(ComplexQueryA);
+            long complexQueryBDuration = timer.DurationFor(ComplexQueryB);
 
             Console.WriteLine($"{smallDataSetDuration.ToString().PadLeft(10, ' ')} ms: 3 customers with  addresses");
             Console.WriteLine($"{largeDataSetDuration.ToString().PadLeft(10, ' ')} ms: All customers with many addresses");
+            Console.WriteLine($"{complexQueryADuration.ToString().PadLeft(10, ' ')} ms: Complex A");
+            Console.WriteLine($"{complexQueryBDuration.ToString().PadLeft(10, ' ')} ms: Complex B");
 
         }
 

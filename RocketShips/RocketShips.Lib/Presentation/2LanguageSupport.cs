@@ -1,7 +1,10 @@
-﻿using RocketShips.Lib.QueryExtensions.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using RocketShips.Lib.Models;
+using RocketShips.Lib.QueryExtensions.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -10,6 +13,15 @@ namespace RocketShips.Lib
 {
     public class LanguageSupport
     {
+        public LanguageSupport(AdventureWorksContext context)
+        {
+            this.context = context;
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("Language Support");
+            Console.ResetColor();
+            Console.ReadLine();
+        }
+
         IList<Student> studentList = new List<Student>() 
         {
             new Student() { StudentID = 1, StudentName = "John", Age = 18 },
@@ -18,9 +30,11 @@ namespace RocketShips.Lib
             new Student() { StudentID = 4, StudentName = "Ram" , Age = 20  },
             new Student() { StudentID = 5, StudentName = "Ron" , Age = 21 }
         };
+        private readonly AdventureWorksContext context;
 
         public void LambdaExpressions()
         {
+            
             Func<int, int> aTriple = x => x * 3;
 
             int sickBoyz = aTriple(5);
@@ -32,12 +46,37 @@ namespace RocketShips.Lib
             };
             string message = launch("Smoo");
             Console.WriteLine(message);
-            
 
-            // Expression trees?
+            Action action = () => Console.WriteLine("Action writes");
 
-            //Funcs vs Expressions
-            //    https://www.tutorialsteacher.com/linq/expression-tree
+            Expression<Func<Student, bool>> stillTeen = s => s.Age >= 13 && s.Age <= 19;
+            Console.WriteLine("Expression: {0}", stillTeen);
+
+            Console.WriteLine("Expression Type: {0}", stillTeen.NodeType);
+
+            var parameters = stillTeen.Parameters;
+
+            foreach (var param in parameters)
+            {
+                Console.WriteLine("Parameter Name: {0}", param.Name);
+                Console.WriteLine("Parameter Type: {0}", param.Type.Name);
+            }
+            var bodyExpr = stillTeen.Body as BinaryExpression;
+
+            Console.WriteLine("Left side of body expression: {0}", bodyExpr.Left);
+            Console.WriteLine("Binary Expression Type: {0}", bodyExpr.NodeType);
+            Console.WriteLine("Right side of body expression: {0}", bodyExpr.Right);
+            Console.WriteLine("Return Type: {0}", stillTeen.ReturnType);
+        }
+
+        public void IQueryableVsIEnumerable()
+        {
+            IEnumerable<Student> students = studentList.Where(s => s.Age >= 21).Take(10);
+
+            IQueryable<Product> products = context.Products.Where(p => p.ListPrice > 500).Take(10);
+            string query = products.ToQueryString();
+            Console.WriteLine(query);
+            System.Diagnostics.Debug.WriteLine(query);
         }
 
         public void ExtensionMethods()
@@ -45,6 +84,9 @@ namespace RocketShips.Lib
             string str = "<script language='javascript'>alert('got eeemm')</script>".HtmlEncode();
 
             Console.WriteLine(str);
+
+            var date = 5.Minutes().Ago();
+            Console.WriteLine(date);
         }
 
         public void VarAndTheAnonymousType()
@@ -88,9 +130,9 @@ namespace RocketShips.Lib
 
             Console.WriteLine($"{range1} {results} {range2}");
 
-        // yield to implement deffered execution, only when you call get enumerator
-        //https://www.tutorialsteacher.com/linq/linq-deferred-execution
-        //Massive
+            // yield to implement deffered execution, only when you call get enumerator
+            //https://www.tutorialsteacher.com/linq/linq-deferred-execution
+            //Massive
             /// <summary>
             /// Enumerates the reader yielding the result - thanks to Jeroen Haegebaert
             /// </summary>
@@ -105,7 +147,7 @@ namespace RocketShips.Lib
             //        }
             //    }
             //}
-
+            //http://svtfs002:8080/tfs/ASG/QuikWorx/_search?text=yield&type=code&lp=dashboard-Project&filters=ProjectFilters%7BQuikWorx%7D&result=DefaultCollection%2FQuikWorx%2FQuikWorx%20API%2FGBrelease%2F1.0.0%2F%2FQuikWorx.Services.Common%2FExtensions%2FWorkflowDataContextExtensions.cs&_a=contents
             //http://svtfs002:8080/tfs/ASG/MHTL/_versionControl?path=%24%2FMHTL%2Fmhtl-mvc-beta1%2FTeleios.MhtlDss.Services%2FRange.cs
             //https://dev.azure.com/teleios-systems-qwapps/GoAB%20-%20Cabinet%20Dashboard%20Solution/_git/GoAB%20-%20Cabinet%20Dashboard%20Solution?path=%2FGoAB.Infrastructure%2FData%2FEfRepository.cs&version=GBmaster
 
@@ -115,7 +157,9 @@ namespace RocketShips.Lib
         {
             var runner = new FunctionHeaderAndWait();
             runner.Decorate("Lambda Expressions", LambdaExpressions);
+            runner.Decorate("IQueryable vs IEnumerable", IQueryableVsIEnumerable); 
             runner.Decorate("Extension Methods", ExtensionMethods);
+            runner.Decorate("Var and the Anonymous Type", VarAndTheAnonymousType);
             runner.Decorate("Query Syntax", QuerySyntax);
             runner.Decorate("Yield and Generics", YieldAndGenerics);
         }
@@ -126,6 +170,24 @@ namespace RocketShips.Lib
         public static string HtmlEncode(this string str)
         {
             return HttpUtility.HtmlEncode(str);
+        }
+    }
+
+    public static class TimeSpanExtensions
+    {
+        public static TimeSpan Minutes(this int value)
+        {
+            return new TimeSpan(0, 0, value, 0, 0);
+        }
+
+        public static TimeSpan Days(this int value)
+        {
+            return new TimeSpan(value, 0, 0, 0);
+        }
+
+        public static DateTime Ago(this TimeSpan value)
+        {
+            return DateTime.Now - value;
         }
     }
 }

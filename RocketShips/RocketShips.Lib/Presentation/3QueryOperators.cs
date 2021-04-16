@@ -54,8 +54,10 @@ namespace RocketShips.Lib
 "Sum" } } };
         public QueryOperators()
         {
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine($"{Environment.NewLine}Query operators");
-            Console.ReadKey();
+            Console.ResetColor();
+            Console.ReadLine();
         }
 
         public void Presenter()
