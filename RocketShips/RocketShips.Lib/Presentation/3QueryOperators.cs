@@ -52,7 +52,6 @@ namespace RocketShips.Lib
 "Max",
 "Min",
 "Sum" } } };
-
         public QueryOperators()
         {
             Console.WriteLine($"{Environment.NewLine}Query operators");
@@ -65,12 +64,29 @@ namespace RocketShips.Lib
             {
                 ListMethods(item.Key, item.Value);
             }
+
+            QueryReflection reflection = new QueryReflection();
+            string run = "What method do you want to run? Type C to cancel";
+            Console.WriteLine(run);
+            string method = Console.ReadLine();
+
+            while (method != "c")
+            {
+                if (method != string.Empty)
+                {
+                    reflection.Actions[method]();
+                }
+                Console.WriteLine(run);
+                method = Console.ReadLine();
+            }
+
+            Console.ReadLine();
         }
 
         private void ListMethods(string title, IEnumerable<string> list)
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.ReadKey();
+            Console.ReadLine();
             Console.WriteLine();
             Console.WriteLine(title);
             Console.ResetColor();

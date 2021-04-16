@@ -1,4 +1,6 @@
-﻿using RocketShips.Lib;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using RocketShips.Lib;
 using RocketShips.Lib.Models;
 using System;
 using System.Linq;
@@ -10,14 +12,20 @@ namespace RocketShips.Move
     {
         static void Main(string[] args)
         {
-            AdventureWorksContext context = new AdventureWorksContext();
+            var optionsBuilder = new DbContextOptionsBuilder<AdventureWorksContext>();
+            optionsBuilder.UseSqlServer(Settings.Adventure);
+            AdventureWorksContext context = new AdventureWorksContext(optionsBuilder.Options);
             //new IntroAnimation().Play();
 
-
+            
             //History history = new History(context);
             //history.HistoryPresenter();
-            QueryOperators queryOperators = new QueryOperators();
-            queryOperators.Presenter();
+
+            LanguageSupport language = new LanguageSupport();
+            language.Presenter();
+
+            //QueryOperators queryOperators = new QueryOperators();
+            //queryOperators.Presenter();
 
             //Performance perf = new Performance(context);
             //perf.PerformancePresenter();

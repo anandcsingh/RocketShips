@@ -1,4 +1,5 @@
-﻿using RocketShips.Lib.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using RocketShips.Lib.Models;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -8,9 +9,12 @@ namespace RocketShips.Lib
 {
     public class History
     {
+        string connString;
+
         public History(AdventureWorksContext context)
         {
             this.context = context;
+            connString = context.Database.GetDbConnection().ConnectionString;
             Console.WriteLine("History");
             Console.ReadLine();
         }
@@ -140,6 +144,12 @@ WHERE p.ProductCategoryID = " + categoryID;
         {
             public int Count { get; set; }
             public string FoundProducts { get; set; }
+        }
+        class Product
+        {
+            public int ID { get; internal set; }
+            public string Name { get; internal set; }
+            public string Category { get; internal set; }
         }
 
         public void HistoryPresenter()
